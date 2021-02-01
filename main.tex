@@ -1,7 +1,7 @@
 \documentclass[a4paper]{article}
 \usepackage[polish]{babel}
 \usepackage{polski}
-\usepackage[utf8x]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
 \usepackage{graphicx}
@@ -18,6 +18,10 @@
             pdfproducer={Latex},
             pdfcreator={pdflatex}]{hyperref}
             
+\usepackage[backend=biber,
+            style=alphabetic,
+            ]{biblatex}
+\addbibresource{bibl.bib}
             
 \title{Projekt przekładni}
 \author{Artur Bauer}
@@ -118,9 +122,9 @@ Obliczono $J_1$ oraz $J_2$ dla czasu $T$, co dało następujące wyniki:
 
 Zgodnie z poleceniem znajdujemy taką wartość $u(t)$, dla której $(J_1, J_2) \rightarrow min$, dla $u(t) \in  [0,1]$.
 \\
-W celu uproszczenia obliczeń jako funkcję $u(t)$ przyjęto $u(t) = 0.5*sin(wt + f)+0.5$.
+W celu uproszczenia obliczeń jako funkcję $u(t)$ przyjęto $u(t) = 0.5*sign(f*t^ + g*t + h)+0.5$.
 \\
-Znalezienie optymalnych wartości $(J_1, J_2) \rightarrow min$ zrealizowano przy pomocy pakietu \textit{Matlab} do znajdowania rozwiązań optymalnych z użyciem algorytmu genetycznego.
+Znalezienie optymalnych wartości $(J_1, J_2) \rightarrow min$ zrealizowano przy pomocy funkcji \texttt{paretosearch} pakietu \textit{Matlab}.
 \\
 Znaleziony zbiór rozwiązań paretooptymalnych (front pareto) przedstawiono na Rys.~\ref{fig:pareto_front}. 
 \begin{figure}[H]
@@ -138,7 +142,7 @@ W celu znalezienia rozwiązania niezdominowanego od zdecydowano się na zmniejsz
 Dla każdego tak zdefiniowanego momentu $t_1$ wyznaczano front pareto korzystajac z metody opisanej w sekcji~\ref{step:2}.
 \\
 Następnie porównano zbiór rozwiązań ze zbiorem rozwiązań z poprzedniej iteracji $T \geq t > t_1$ i wykluczono rozwiązania niepowtarzające się.
-\\ Krok opisany w sekcji~\ref{step:3} potwarzano aż w zbiorze rozwiązań zostało jedno rozwiązanie. 
+\\ Krok opisany w sekcji~\ref{step:3} powtarzano aż w zbiorze rozwiązań zostało jedno rozwiązanie. 
 
 \subsubsection{Znalezienie optymalnej trajektorii x odpowiadającej optymalnej wartości u}
 \label{step:4}
@@ -147,10 +151,11 @@ Dla znalezionej optymalnej wartości $u(t)$ obliczamy optymalną trajektorię ko
 \\
 Optymalne parametry znalezione przez \textit{Matlab} to 
 \begin{itemize}
-    \item $w = -7.63798059533210e-07$
-    \item $f = -0.565362952411354$,
+    \item $f = -2.5 $
+    \item $g = 2.5 $
+    \item $h = 7.5$,
 \end{itemize}
-dla funkcji sterowania: $u(t) = 0.5*sin(wt + f)+0.5$.
+dla funkcji sterowania: $u(t) = 0.5*sign(f*t^2 + g*t + h)+0.5$.
 \\Optymalna trajektoria ruchu dla tej funkcji została przedstawiona na Rys.~\ref{fig:trajectory}.
 \begin{figure}[H]
     \centering
@@ -159,8 +164,25 @@ dla funkcji sterowania: $u(t) = 0.5*sin(wt + f)+0.5$.
     \label{fig:trajectory}
 \end{figure}
 
+\section{Wnioski}
+Z uwagi na mało optymalne sterowanie sygnałem sinusoidanlym zdecydowano się na zastosowanie sygnału typu \textit{bang-bang}.
+Sterowanie to posiadało maksymalnie 2 przejścia między sygnałami. 
+Zdecydowano się na wyciągnięcie znaku wielomianu 2 stopnia i przesunięciu go w osi 0Y.
+Konieczna była optymalizacja 3 parametrowa zamiast początkowo przewidzianej 2 parametrowej. 
+Całkę obliczono sumując czas, w którym sterowanie miało wartość 1. 
+
+
+Zrezygnowano z obliczeń metodą \texttt{gamultiobj} na rzecz metody \texttt{paretosearch} co znacząco zwiększyło czas obliczeń, ale pozwoliło na uzyskanie dokładniejszych wyników.
+
+Alternatywną metodą obliczenia sterowania optymalnego byłoby wykorzystanie mnożnika Lagrange analogicznie jak w publikacji \cite{kaya2004computations}.
+Z uwagi na inne zobowiązania nie byłem w stanie jednak wykonać implementacji wyżej wymienionego rozwiązania. 
+
+
 \newpage
 \section{Listingi}
 \lstinputlisting[caption=Klasa Undmoinated, language=Matlab]{matlab/Nondominated.m}
 \lstinputlisting[caption=Skrypt uruchamiający, language=Matlab]{matlab/nonDomTst.m}
+
+\newpage
+\printbibliography
 \end{document}
